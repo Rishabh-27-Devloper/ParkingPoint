@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vehicle - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles" class="active"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-section">
+                <h2>Edit Vehicle</h2>
+                <a href="/vehicles" class="btn btn-secondary" style="margin-bottom:18px;"><i class="fas fa-arrow-left"></i> Back to Vehicles</a>
+                {% if error %}
+                <div class="alert alert-danger" style="margin-bottom:18px;">{{ error }}</div>
+                {% endif %}
+                <form method="post" class="form-card" autocomplete="off" style="max-width:420px;">
+                    <div class="form-group">
+                        <label for="type"><i class="fas fa-car"></i> Vehicle Type</label>
+                        <select name="type" id="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Car" {% if (vehicle and vehicle.type == 'Car') or (request.form.type == 'Car') %}selected{% endif %}>Car</option>
+                            <option value="Bike" {% if (vehicle and vehicle.type == 'Bike') or (request.form.type == 'Bike') %}selected{% endif %}>Bike</option>
+                            <option value="SUV" {% if (vehicle and vehicle.type == 'SUV') or (request.form.type == 'SUV') %}selected{% endif %}>SUV</option>
+                            <option value="Van" {% if (vehicle and vehicle.type == 'Van') or (request.form.type == 'Van') %}selected{% endif %}>Van</option>
+                            <option value="Other" {% if (vehicle and vehicle.type == 'Other') or (request.form.type == 'Other') %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="model"><i class="fas fa-car-side"></i> Model</label>
+                        <input type="text" name="model" id="model" value="{{ request.form.model or (vehicle.model if vehicle else '') }}" required maxlength="50" placeholder="e.g. Honda City">
+                    </div>
+                    <div class="form-group">
+                        <label for="number"><i class="fas fa-id-card"></i> Vehicle Number</label>
+                        <input type="text" name="number" id="number" value="{{ request.form.number or (vehicle.number if vehicle else '') }}" required maxlength="20" placeholder="e.g. KA01AB1234" style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label for="color"><i class="fas fa-palette"></i> Color</label>
+                        <input type="text" name="color" id="color" value="{{ request.form.color or (vehicle.color if vehicle else '') }}" required maxlength="30" placeholder="e.g. White">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px;">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        // Close sidebar on click outside (mobile)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        // Close sidebar on navigation (mobile)
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

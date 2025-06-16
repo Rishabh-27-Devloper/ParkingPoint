@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Parking - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_insiide.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book" class="active"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+
+            <div class="booking-container">
+                <!-- Booking Steps -->
+                <div class="booking-steps">
+                    <div class="step active" id="step-1">
+                        <div class="step-number">1</div>
+                        <span>Select Location</span>
+                    </div>
+                    <div class="step" id="step-2">
+                        <div class="step-number">2</div>
+                        <span>Choose Slot</span>
+                    </div>
+                    <div class="step" id="step-3">
+                        <div class="step-number">3</div>
+                        <span>Select Time</span>
+                    </div>
+                    <div class="step" id="step-4">
+                        <div class="step-number">4</div>
+                        <span>Vehicle & Payment</span>
+                    </div>
+                </div>
+
+                <!-- Step 1: Location Selection -->
+                <div class="booking-section" id="location-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Select Parking Location
+                    </h2>
+                    <div class="parking-lot-grid">
+                        {% for lot in parking_lots %}
+                        <div class="parking-lot-card" onclick="selectParkingLot(event, '{{ lot.id }}', '{{ lot.name }}', '{{ lot.rate }}')">
+                            <div class="lot-header">
+                                <div class="lot-name">{{ lot.name }}</div>
+                                <div class="lot-rate">₹{{ lot.rate }}/hr</div>
+                            </div>
+                            <div class="lot-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ lot.locality }}
+                            </div>
+                            <div class="lot-capacity">
+                                <i class="fas fa-car"></i>
+                                {{ lot.available_spots }}/{{ lot.capacity }} Available
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; color: #6c757d; grid-column: 1/-1; padding: 40px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>No parking locations available at the moment.</p>
+                            <a href="/support" class="btn btn-primary">Contact Support</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Step 2: Slot Selection -->
+                <div class="booking-section slot-selection-area" id="slot-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-th"></i>
+                        Choose Your Parking Slot
+                    </h2>
+                    
+                    <div class="slot-legend">
+                        <div class="legend-item">
+                            <div class="legend-color available"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color occupied"></div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color selected"></div>
+                            <span>Selected</span>
+                        </div>
+                    </div>
+
+                    <div class="parking-grid" id="parking-grid">
+                        <!-- Parking slots will be generated here -->
+                    </div>
+
+                    <div class="selected-slot-info hidden" id="selected-slot-info">
+                        <strong>Selected Slot: </strong><span id="selected-slot-display">None</span>
+                    </div>
+                </div>
+
+                <!-- Step 3: Date & Time Selection -->
+                <div class="booking-section hidden" id="datetime-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Select Entry & Exit Time
+                    </h2>
+                    
+                    <div class="datetime-grid">
+                        <div class="datetime-group">
+                            <div class="datetime-label">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Entry Date & Time
+                            </div>
+                            <input type="date" class="form-control" id="entry-date" min="">
+                            <input type="time" class="form-control" id="entry-time" style="margin-top: 10px;">
+                            <div class="error-message" id="entry-error">Please select a valid entry time</div>
+                        </div>
+                        
+                        <div class="datetime-group">
+                            <div class="datetime-label">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Exit Date & Time
+                            </div>
+                            <input type="date" class="form-control" id="exit-date" min="">
+                            <input type="time" class="form-control" id="exit-time" style="margin-top: 10px;">
+                            <div class="error-message" id="exit-error">Please select a valid exit time</div>
+                        </div>
+                    </div>
+
+                    <div class="duration-display hidden" id="duration-display">
+                        Duration: <span id="duration-text">0 hours</span>
+                    </div>
+
+                    <div class="pricing-summary hidden" id="pricing-summary">
+                        <h3 style="margin-bottom: 15px; color: #2c5aa0;">
+                            <i class="fas fa-calculator"></i>
+                            Pricing Summary
+                        </h3>
+                        <div class="pricing-row">
+                            <span>Hourly Rate:</span>
+                            <span id="hourly-rate">₹0/hr</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span>Duration:</span>
+                            <span id="duration-hours">0 hours</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">₹0</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span>Tax (18% GST):</span>
+                            <span id="tax-amount">₹0</span>
+                        </div>
+                        <div class="pricing-row">
+                            <span><strong>Total Amount:</strong></span>
+                            <span id="total-amount"><strong>₹0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Vehicle Selection & Payment -->
+                <div class="booking-section hidden" id="payment-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-car"></i>
+                        Select Vehicle
+                    </h2>
+                    
+                    <div class="vehicle-selection" id="vehicle-selection">
+                        {% for vehicle in vehicles %}
+                        <div class="vehicle-card" onclick="selectVehicle(event, '{{ vehicle.id }}', '{{ vehicle.number }}', '{{ vehicle.model }}')">
+                            <div class="vehicle-icon">
+                                {% if vehicle.type == 'Car' %}
+                                <i class="fas fa-car"></i>
+                                {% elif vehicle.type == 'Bike' %}
+                                <i class="fas fa-motorcycle"></i>
+                                {% elif vehicle.type == 'Truck' %}
+                                <i class="fas fa-truck"></i>
+                                {% else %}
+                                <i class="fas fa-car"></i>
+                                {% endif %}
+                            </div>
+                            <div class="vehicle-info">{{ vehicle.model }}</div>
+                            <div class="vehicle-number">{{ vehicle.number }}</div>
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; color: #6c757d; grid-column: 1/-1; padding: 40px;">
+                            <i class="fas fa-car" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>No vehicles registered. Please add a vehicle first.</p>
+                            <a href="/vehicles/add" class="btn btn-primary">Add Vehicle</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="selected-slot-info hidden" id="selected-vehicle-info">
+                        <strong>Selected Vehicle: </strong><span id="selected-vehicle-display">None</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary hidden" id="back-btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="btn btn-primary" id="next-btn" onclick="nextStep()" disabled>
+                        Next
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-primary hidden" id="book-btn" onclick="bookParking()">
+                        <i class="fas fa-credit-card"></i>
+                        Proceed to Payment
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <!-- <a href="https://wa.me/919686929429" class="fa-brands" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a> -->
+    <script src="{{url_for('static',filename='scriptBooking.js')}}"></script>
+    </body>
+</html>

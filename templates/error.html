@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        .error-container {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 16px;
+        }
+        .error-icon {
+            font-size: 5rem;
+            color: #e74c3c;
+            margin-bottom: 24px;
+        }
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #222;
+        }
+        .error-message {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 32px;
+            word-break: break-word;
+        }
+        .error-actions .btn {
+            margin: 0 8px;
+        }
+        @media (max-width: 600px) {
+            .error-title { font-size: 2rem; }
+            .error-icon { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{{url_for('static',filename='logo.jpg')}}" class="logo-img" style="height: 40px; width: auto; display: inline-block; vertical-align: middle;">
+                <span style="display: inline-block; vertical-align: middle;">Parking Point</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">Sign Up</a></li>
+            </ul>
+            <div class="mobile-menu" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Error Content -->
+    <main class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-title">An Error Occurred</div>
+        <div class="error-message">
+            {% if error %}
+                {{ error }}
+            {% else %}
+                Sorry, something went wrong on our end.<br>
+                Please try again later or contact support.
+            {% endif %}
+        </div>
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Go to Home</a>
+            <a href="/login" class="btn btn-secondary"><i class="fas fa-sign-in-alt"></i> Login</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Parking Point</h3>
+                    <p>Smart parking solutions for modern cities. Making parking simple, secure, and accessible for everyone.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="/">Home</a></p>
+                    <p><a href="#about">About Us</a></p>
+                    <p><a href="#features">Services</a></p>
+                    <p><a href="#contact">Contact</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Account</h3>
+                    <p><a href="/login">Login</a></p>
+                    <p><a href="/signup">Sign Up</a></p>
+                    <p><a href="/book">Book Parking</a></p>
+                    <p><a href="/profile">My Profile</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <p><a href="#help">Help Center</a></p>
+                    <p><a href="#faq">FAQ</a></p>
+                    <p><a href="#privacy">Privacy Policy</a></p>
+                    <p><a href="#terms">Terms of Service</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Parking Point - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+        // Button click ripple effect
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    pointer-events: none;
+                `;
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+        // Add ripple animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

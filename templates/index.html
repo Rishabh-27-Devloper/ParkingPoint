@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Point - Smart Parking Solutions</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="#" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{{url_for('static',filename='logo.jpg')}}" class="logo-img" style="height: 40px; width: auto; display: inline-block; vertical-align: middle;">
+                <span style="display: inline-block; vertical-align: middle;">Parking Point</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">Sign Up</a></li>
+            </ul>
+            <div class="mobile-menu" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Smart Parking Solutions for You</h1>
+            <p class="hero-subtitle">Find hassle-free parking near you with ease. Book your spot instantly and save time with our intelligent parking management system.</p>
+            <div class="cta-buttons">
+                <a href="/book" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i> Book Your Spot Now
+                </a>
+                <a href="#features" class="btn btn-secondary" style="color:white !important;">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Why Choose Parking Point?</h2>
+                <p>Experience the future of parking with our innovative solutions designed to make your life easier.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-search-location"></i>
+                    </div>
+                    <h3>Find Parking Instantly</h3>
+                    <p>Locate available parking spots near your destination in real-time with our smart search technology.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Book on the Go</h3>
+                    <p>Reserve your parking spot from anywhere using our mobile-friendly platform. Quick, easy, and secure.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Secure & Safe</h3>
+                    <p>All our parking locations are monitored and secure, ensuring your vehicle's safety while you're away.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>24/7 Availability</h3>
+                    <p>Access parking solutions round the clock with our automated system and customer support.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>Competitive Pricing</h3>
+                    <p>Enjoy affordable parking rates with transparent pricing and no hidden fees.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Eco-Friendly</h3>
+                    <p>Reduce your carbon footprint by eliminating unnecessary driving while searching for parking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="contact">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-info animate-on-scroll">
+                    <h2>About Parking Point</h2>
+                    <p>We're revolutionizing urban parking with smart technology that connects drivers to available spaces efficiently. Our mission is to eliminate parking stress and create smarter cities.</p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Open today: 09:00 AM - 05:00 PM</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+91 9686929429</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@parkingpoint.com</span>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/919686929429" class="whatsapp-btn">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        Message us on WhatsApp
+                    </a>
+                </div>
+                <div class="contact-info animate-on-scroll">
+                    <h2>Get Started Today</h2>
+                    <p>Join thousands of satisfied customers who have made parking hassle-free with Parking Point.</p>
+                    <div class="cta-buttons">
+                        <a href="/signup" class="btn btn-primary">Sign Up Now</a>
+                        <a href="/login" class="btn btn-secondary" style="color:white !important;">Already a member? Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Parking Point</h3>
+                    <p>Smart parking solutions for modern cities. Making parking simple, secure, and accessible for everyone.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="#home">Home</a></p>
+                    <p><a href="#about">About Us</a></p>
+                    <p><a href="#features">Services</a></p>
+                    <p><a href="#contact">Contact</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Account</h3>
+                    <p><a href="/login">Login</a></p>
+                    <p><a href="/signup">Sign Up</a></p>
+                    <p><a href="/book">Book Parking</a></p>
+                    <p><a href="/profile">My Profile</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <p><a href="#help">Help Center</a></p>
+                    <p><a href="#faq">FAQ</a></p>
+                    <p><a href="#privacy">Privacy Policy</a></p>
+                    <p><a href="#terms">Terms of Service</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Parking Point - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // Blur previous section when features section is in focus (desktop & mobile)
+        document.addEventListener('DOMContentLoaded', function () {
+            const featuresSection = document.getElementById('features');
+            const heroSection = document.getElementById('home');
+            let blurred = false;
+
+            function blurHero(shouldBlur) {
+                if (shouldBlur) {
+                    heroSection.classList.add('blurred-section');
+                    blurred = true;
+                } else {
+                    heroSection.classList.remove('blurred-section');
+                    blurred = false;
+                }
+            }
+
+            // IntersectionObserver for desktop and most browsers
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        blurHero(entry.isIntersecting);
+                    });
+                },
+                {
+                    threshold: 0.15 // Lower threshold for mobile viewport
+                }
+            );
+            if (featuresSection && heroSection) {
+                observer.observe(featuresSection);
+            }
+
+            // Fallback for mobile browsers that don't trigger intersection events reliably
+            window.addEventListener('scroll', function () {
+                if (!featuresSection || !heroSection) return;
+                const rect = featuresSection.getBoundingClientRect();
+                const vh = window.innerHeight || document.documentElement.clientHeight;
+                // If top of features section is within top 60% of viewport, blur hero
+                if (rect.top < vh * 0.6 && rect.bottom > vh * 0.2) {
+                    blurHero(true);
+                } else {
+                    blurHero(false);
+                }
+            }, { passive: true });
+        });
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Close mobile menu if open
+                document.querySelector('.nav-menu').classList.remove('active');
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.boxShadow = '0 2px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Animate on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Button click animations
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add ripple animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+        // Create splash overlay
+        const splash = document.createElement('div');
+        splash.id = 'splash-screen';
+        splash.innerHTML = `
+            <div class="splash-content">
+            <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo" class="splash-logo">
+            </div>
+        `;
+        document.body.appendChild(splash);
+
+        // Splash screen styles
+        const splashStyle = document.createElement('style');
+        splashStyle.textContent = `
+            #splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: #fff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+            }
+            #splash-screen .splash-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            }
+            .splash-logo {
+            width: 120px;
+            max-width: 40vw;
+            height: auto;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            }
+            @media (max-width: 600px) {
+            .splash-logo {
+                width: 80px;
+                max-width: 60vw;
+            }
+            }
+        `;
+        document.head.appendChild(splashStyle);
+
+        // Remove splash on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 500);
+            }, 400); // slight delay for effect
+        });
+    </script>
+</body>
+</html>

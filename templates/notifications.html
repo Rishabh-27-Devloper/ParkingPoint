@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{ user.avatar_url }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-section">
+                <h2><i class="fas fa-bell"></i> Notifications</h2>
+                <div class="notifications-list">
+                    {% if notifications %}
+                        {% for n in notifications %}
+                        <div class="notification-item{% if not n.seen %} notification-unread{% endif %}">
+                            <div class="notification-icon">
+                                <i class="fas fa-circle{% if n.seen %}-check{% endif %}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-message">{{ n.message }}</div>
+                                <div class="notification-date">{{ n.created_at.strftime('%d %b %Y, %I:%M %p') if n.created_at else '' }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align:center;color:#aaa;padding:32px 0;">
+                            <i class="fas fa-inbox" style="font-size:2em;"></i><br>
+                            No notifications found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+    <style>
+        .notifications-list {
+            margin-top: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            background: #f7faff;
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(44,123,255,0.04);
+            border-left: 4px solid #2b7cff;
+            transition: background 0.2s;
+        }
+        .notification-unread {
+            background: #eaf2ff;
+            border-left-color: #ff9800;
+        }
+        .notification-icon {
+            margin-right: 16px;
+            color: #2b7cff;
+            font-size: 1.3em;
+            margin-top: 2px;
+        }
+        .notification-unread .notification-icon {
+            color: #ff9800;
+        }
+        .notification-content {
+            flex: 1;
+        }
+        .notification-message {
+            font-size: 1.07em;
+            color: #222;
+            margin-bottom: 6px;
+        }
+        .notification-date {
+            font-size: 0.93em;
+            color: #888;
+        }
+    </style>
+</body>
+</html>

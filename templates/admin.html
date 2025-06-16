@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+        /* Custom styles for Capacity and Rate fields */
+        .form-group input#capacity,
+        .form-group input#rate {
+            border: 2px solid #2b7cff;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            background: #f8fbff;
+            transition: border 0.2s;
+        }
+        .form-group input#capacity:focus,
+        .form-group input#rate:focus {
+            border-color: #174a8c;
+            outline: none;
+        }
+        .form-group label[for="rate"]::after {
+            content: " (in ₹ per hour)";
+            color: #2b7cff;
+            font-size: 0.95em;
+            margin-left: 4px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="/admin" class="active">
+                            <i class="fas fa-user-shield"></i> Main Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="Admin Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ admin.name or "Admin" }}</span>
+                        <small>{{ admin.email or "admin@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-widgets">
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-parking"></i></div>
+                    <div class="widget-title">Total Bookings</div>
+                    <div class="widget-value">{{ stats.total_bookings or 0 }}</div>
+                </div>
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="widget-title">Parking Spots</div>
+                    <div class="widget-value">{{ stats.total_spots or 0 }}</div>
+                </div>
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-users"></i></div>
+                    <div class="widget-title">Users</div>
+                    <div class="widget-value">{{ stats.total_users or 0 }}</div>
+                </div>
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="widget-title">Revenue</div>
+                    <div class="widget-value">&#8377; {{ stats.revenue or "0.00" }}</div>
+                </div>
+            </div>
+            <div class="dashboard-section" style="display:flex;flex-wrap:wrap;gap:32px;">
+                <div style="flex:1;min-width:320px;">
+                    <h2>Bookings Overview</h2>
+                    <canvas id="bookingsChart" height="180"></canvas>
+                </div>
+                <div style="flex:1;min-width:320px;">
+                    <h2>Revenue Overview</h2>
+                    <canvas id="revenueChart" height="180"></canvas>
+                </div>
+            </div>
+            <div class="dashboard-section" style="margin-top:32px;">
+                <h2>Register New Parking Spot</h2>
+                <form action="/admin/spots/register" method="POST" class="form" style="max-width:480px;">
+                    <div class="form-group">
+                        <label for="spot_name">Spot Name</label>
+                        <input type="text" id="spot_name" name="spot_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacity">Capacity</label>
+                        <input type="number" id="capacity" name="capacity" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rate">Rate</label>
+                        <input type="number" id="rate" name="rate" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="map">Choose Location on Map</label>
+                        <div id="map" style="height: 300px; border-radius:8px; margin-bottom:12px;"></div>
+                        <input type="hidden" id="latitude" name="latitude" required>
+                        <input type="hidden" id="longitude" name="longitude" required>
+                        <small style="color:#888;">Drag the marker or click on the map to set the location.</small>
+                    </div>
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Default coordinates (India center)
+                            const defaultLat = 22.9734, defaultLng = 78.6569;
+                            const map = L.map('map').setView([defaultLat, defaultLng], 5);
+
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; OpenStreetMap contributors'
+                            }).addTo(map);
+
+                            let marker = L.marker([defaultLat, defaultLng], {draggable:true}).addTo(map);
+
+                            // Set initial values
+                            document.getElementById('latitude').value = defaultLat;
+                            document.getElementById('longitude').value = defaultLng;
+
+                            function updateLatLng(lat, lng) {
+                                document.getElementById('latitude').value = lat;
+                                document.getElementById('longitude').value = lng;
+                            }
+
+                            marker.on('dragend', function(e) {
+                                const {lat, lng} = e.target.getLatLng();
+                                updateLatLng(lat, lng);
+                            });
+
+                            map.on('click', function(e) {
+                                marker.setLatLng(e.latlng);
+                                updateLatLng(e.latlng.lat, e.latlng.lng);
+                            });
+                        });
+                    </script>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Register Spot</button>
+                </form>
+            </div>
+            <div class="dashboard-section" style="margin-top:32px;">
+                <h2>Recent Parking Spots</h2>
+                <div class="bookings-table-responsive">
+                <table class="bookings-table">
+                    <thead>
+                        <tr>
+                            <th>Spot Name</th>
+                            <th>Location</th>
+                            <th>Capacity</th>
+                            <th>Rate</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for spot in recent_spots %}
+                        <tr>
+                            <td>{{ spot.name }}</td>
+                            <td>{{ spot.location }}</td>
+                            <td>{{ spot.capacity }}</td>
+                            <td>&#8377; {{ spot.rate }}</td>
+                            <td>
+                                <span class="status {{ spot.status|lower }}">
+                                    {{ spot.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;color:#aaa;">No recent spots found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        // Close sidebar on click outside (mobile)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        // Close sidebar on navigation (mobile)
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+
+        // Chart.js - Bookings Overview
+        const bookingsChart = document.getElementById('bookingsChart').getContext('2d');
+        new Chart(bookingsChart, {
+            type: 'line',
+            data: {
+                labels: {{ charts.bookings.labels|tojson }},
+                datasets: [{
+                    label: 'Bookings',
+                    data: {{ charts.bookings.data|tojson }},
+                    borderColor: '#2b7cff',
+                    backgroundColor: 'rgba(43,124,255,0.08)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: '#eee' } }
+                }
+            }
+        });
+
+        // Chart.js - Revenue Overview
+        const revenueChart = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueChart, {
+            type: 'bar',
+            data: {
+                labels: {{ charts.revenue.labels|tojson }},
+                datasets: [{
+                    label: 'Revenue',
+                    data: {{ charts.revenue.data|tojson }},
+                    backgroundColor: '#2b7cff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: '#eee' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

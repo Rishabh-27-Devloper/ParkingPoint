@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="#" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{{url_for('static',filename='logo.jpg')}}" class="logo-img" style="height: 40px; width: auto; display: inline-block; vertical-align: middle;">
+                <span style="display: inline-block; vertical-align: middle;">Parking Point</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">Sign Up</a></li>
+            </ul>
+            <div class="mobile-menu" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Terms of Service Content -->
+    <main class="container" style="max-width: 800px; margin: 3rem auto 2rem auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.06);">
+        <h1>Terms of Service</h1>
+        <p>Welcome to our website. By accessing or using our site, you agree to comply with and be bound by the following terms and conditions.</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By using this website, you agree to these Terms of Service. If you do not agree, please do not use the site.</p>
+
+        <h2>2. Use of the Website</h2>
+        <p>You agree to use the website only for lawful purposes and in a way that does not infringe the rights of others.</p>
+
+        <h2>3. Intellectual Property</h2>
+        <p>All content on this website is the property of the website owner and is protected by applicable copyright and trademark laws.</p>
+
+        <h2>4. Limitation of Liability</h2>
+        <p>We are not liable for any damages arising from the use or inability to use this website.</p>
+
+        <h2>5. Changes to Terms</h2>
+        <p>We reserve the right to modify these terms at any time. Changes will be posted on this page.</p>
+
+        <h2>6. Contact Us</h2>
+        <p>If you have any questions about these Terms, please contact us at info@parkingpoint.com.</p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- ...footer sections as in your landing page... -->
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Parking Point - All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- (Optional) Add your scripts here, or reference a shared JS file -->
+    <script>
+        // Reuse your navigation/menu scripts here if needed
+        function toggleMenu() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

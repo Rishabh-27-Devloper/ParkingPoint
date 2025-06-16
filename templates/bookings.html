@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings" class="active"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-section">
+                <h2>My Bookings</h2>
+                <div class="bookings-table-responsive">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Parking Lot</th>
+                                <th>Date</th>
+                                <th>Vehicle</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.lot_name }}</td>
+                                <td>{{ booking.date }}</td>
+                                <td>{{ booking.vehicle }}</td>
+                                <td>
+                                    <span class="status {{ booking.status|lower }}">
+                                        {{ booking.status }}
+                                    </span>
+                                </td>
+                                <td>&#8377; {{ booking.amount }}</td>
+                                <td>
+                                    {% if booking.status == 'Active' %}
+                                    <a class="btn btn-secondary btn-sm" onclick="viewTicket('{{ booking.id }}')">View Ticket</a>
+                                    {% else %}
+                                    <span style="color:#aaa;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align:center;color:#aaa;">No bookings found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+    <script>
+function viewTicket(bookingId) {
+    fetch(`/view_ticket/${bookingId}`)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .then(json => {
+            // Create the popup overlay
+            let popup = document.createElement('div');
+            popup.id = 'ticket-popup-overlay';
+            popup.innerHTML = `
+                <div class="ticket-popup-modal">
+                    <button class="ticket-popup-close" aria-label="Close" onclick="document.getElementById('ticket-popup-overlay').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="ticket-popup-header">
+                        <img src="/static/logo.jpg" alt="Parking Point Logo" class="ticket-popup-logo">
+                        <span class="ticket-popup-title">Parking Ticket</span>
+                    </div>
+                    <div class="ticket-popup-body">
+                        <div class="ticket-popup-info">
+                            <div><strong>Vehicle:</strong> <span>${json.vehicle_id}</span></div>
+                            <div><strong>Owner Email:</strong> <span>${json.owner_email}</span></div>
+                            <div><strong>Spot:</strong> <span>${json.slot_no}</span></div>
+                            <div><strong>Amount:</strong> <span>&#8377; ${json.amount}</span></div>
+                            <div><strong>Entry Time:</strong> <span>${json.entry_epoch ? new Date(json.entry_epoch * 1000).toLocaleString() : 'N/A'}</span></div>
+                            <div><strong>Exit Time:</strong> <span>${json.exit_epoch ? new Date(json.exit_epoch * 1000).toLocaleString() : 'N/A'}</span></div>
+                        </div>
+                        <div class="ticket-popup-qr">
+                            <img src="/${json.qr_path.replace(/\\/g, '/')}" alt="QR Code" width="140" height="140">
+                        </div>
+                    </div>
+                    <button class="ticket-popup-download" onclick="downloadTicketPopup('${json.code}')">
+                        <i class="fas fa-download"></i> Download Ticket
+                    </button>
+                </div>
+                <style>
+                    #ticket-popup-overlay {
+                        position: fixed;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        background: rgba(44, 62, 80, 0.45);
+                        z-index: 2000;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .ticket-popup-modal {
+                        background: #fff;
+                        border-radius: 14px;
+                        box-shadow: 0 8px 32px rgba(43,124,255,0.12), 0 1.5px 6px rgba(0,0,0,0.07);
+                        max-width: 420px;
+                        width: 95vw;
+                        padding: 0 0 28px 0;
+                        position: relative;
+                        animation: popupIn 0.22s cubic-bezier(.4,1.4,.6,1) 1;
+                    }
+                    @keyframes popupIn {
+                        from { transform: scale(0.92); opacity: 0; }
+                        to { transform: scale(1); opacity: 1; }
+                    }
+                    .ticket-popup-close {
+                        position: absolute;
+                        top: 16px; right: 18px;
+                        background: none;
+                        border: none;
+                        font-size: 1.3em;
+                        color: #2b7cff;
+                        cursor: pointer;
+                        z-index: 2;
+                    }
+                    .ticket-popup-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        padding: 28px 32px 10px 32px;
+                        border-bottom: 1px solid #f0f3fa;
+                    }
+                    .ticket-popup-logo {
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 8px;
+                        object-fit: cover;
+                        background: #f0f3fa;
+                    }
+                    .ticket-popup-title {
+                        font-size: 1.35em;
+                        font-weight: 700;
+                        color: #2b7cff;
+                        letter-spacing: 0.5px;
+                    }
+                    .ticket-popup-body {
+                        padding: 18px 32px 0 32px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+                    .ticket-popup-info {
+                        width: 100%;
+                        margin-bottom: 18px;
+                        font-size: 1.04em;
+                    }
+                    .ticket-popup-info div {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 7px;
+                        color: #222;
+                    }
+                    .ticket-popup-info strong {
+                        color: #2b7cff;
+                        font-weight: 600;
+                        min-width: 110px;
+                    }
+                    .ticket-popup-qr {
+                        margin: 12px 0 0 0;
+                        text-align: center;
+                    }
+                    .ticket-popup-download {
+                        margin: 22px auto 0 auto;
+                        display: block;
+                        background: #2b7cff;
+                        color: #fff;
+                        border: none;
+                        padding: 10px 32px;
+                        border-radius: 6px;
+                        font-size: 1em;
+                        font-weight: 600;
+                        cursor: pointer;
+                        box-shadow: 0 2px 8px rgba(43,124,255,0.07);
+                        transition: background 0.18s;
+                    }
+                    .ticket-popup-download:hover {
+                        background: #195bbf;
+                    }
+                    @media (max-width: 600px) {
+                        .ticket-popup-modal { padding: 0 0 18px 0; }
+                        .ticket-popup-header, .ticket-popup-body { padding-left: 12px; padding-right: 12px; }
+                    }
+                </style>
+            `;
+            document.body.appendChild(popup);
+
+            // Download function for popup
+            window.downloadTicketPopup = function(ticketCode) {
+                const modal = document.querySelector('.ticket-popup-modal');
+                // Clone the modal and remove close/download buttons
+                const clone = modal.cloneNode(true);
+                clone.querySelector('.ticket-popup-close').remove();
+                clone.querySelector('.ticket-popup-download').remove();
+
+                // Create a new window for printing
+                const printWindow = window.open('', '', 'width=600,height=800');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Parking Ticket</title>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { background: #f8f9fa; margin: 0; padding: 0; }
+                            .ticket-popup-modal { 
+                                background: #fff;
+                                border-radius: 14px;
+                                box-shadow: 0 8px 32px rgba(43,124,255,0.12), 0 1.5px 6px rgba(0,0,0,0.07);
+                                max-width: 420px;
+                                width: 95vw;
+                                padding: 0 0 28px 0;
+                                margin: 40px auto;
+                                position: relative;
+                            }
+                            .ticket-popup-header {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 28px 32px 10px 32px;
+                                border-bottom: 1px solid #f0f3fa;
+                            }
+                            .ticket-popup-logo {
+                                width: 38px;
+                                height: 38px;
+                                border-radius: 8px;
+                                object-fit: cover;
+                                background: #f0f3fa;
+                            }
+                            .ticket-popup-title {
+                                font-size: 1.35em;
+                                font-weight: 700;
+                                color: #2b7cff;
+                                letter-spacing: 0.5px;
+                            }
+                            .ticket-popup-body {
+                                padding: 18px 32px 0 32px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                            }
+                            .ticket-popup-info {
+                                width: 100%;
+                                margin-bottom: 18px;
+                                font-size: 1.04em;
+                            }
+                            .ticket-popup-info div {
+                                display: flex;
+                                justify-content: space-between;
+                                margin-bottom: 7px;
+                                color: #222;
+                            }
+                            .ticket-popup-info strong {
+                                color: #2b7cff;
+                                font-weight: 600;
+                                min-width: 110px;
+                            }
+                            .ticket-popup-qr {
+                                margin: 12px 0 0 0;
+                                text-align: center;
+                            }
+                            @media (max-width: 600px) {
+                                .ticket-popup-modal { padding: 0 0 18px 0; }
+                                .ticket-popup-header, .ticket-popup-body { padding-left: 12px; padding-right: 12px; }
+                            }
+                        </style>
+                    </head>
+                    <body>${clone.outerHTML}</body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                // Wait for images to load before printing
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                    }, 400);
+                };
+            };
+        })
+        .catch(error => {
+            alert('Could not load ticket. Please try again.');
+            console.error('There was a problem with the fetch operation:', error);
+        });
+}
+</script>
+</body>
+</html>

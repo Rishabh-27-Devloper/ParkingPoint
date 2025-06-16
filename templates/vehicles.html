@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vehicles - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <style>
+    .vehicles-table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 18px;
+    }
+    .vehicles-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .vehicles-table th, .vehicles-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .vehicles-table th {
+        background: #f8faff;
+        font-weight: 600;
+        color: #2b7cff;
+    }
+    .vehicles-table tr:last-child td {
+        border-bottom: none;
+    }
+    .vehicles-table td .btn {
+        margin-right: 6px;
+    }
+    @media (max-width: 700px) {
+        .vehicles-table th, .vehicles-table td {
+            padding: 10px 8px;
+            font-size: 14px;
+        }
+    }
+</style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles" class="active"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-widgets">
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-parking"></i></div>
+                    <div class="widget-title">Active Bookings</div>
+                    <div class="widget-value">{{ stats.active_bookings or 0 }}</div>
+                </div>
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-car"></i></div>
+                    <div class="widget-title">My Vehicles</div>
+                    <div class="widget-value">{{ stats.vehicles or 0 }}</div>
+                </div>
+                <div class="widget-card">
+                    <div class="widget-icon"><i class="fas fa-bell"></i></div>
+                    <div class="widget-title">Notifications</div>
+                    <div class="widget-value">{{ stats.notifications or 0 }}</div>
+                </div>
+            </div>
+            <div class="dashboard-section">
+                <h2>My Vehicles</h2>
+                <div style="margin-bottom:18px;">
+                    <a href="/vehicles/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add Vehicle</a>
+                </div>
+                {% if vehicles %}
+                <div class="vehicles-table-responsive">
+                    <table class="vehicles-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Number</th>
+                                <th>Color</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicle in vehicles %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-car" style="margin-right:6px;"></i>
+                                    {{ vehicle.type or 'Car' }}
+                                </td>
+                                <td>{{ vehicle.model or '-' }}</td>
+                                <td>{{ vehicle.number or '-' }}</td>
+                                <td>{{ vehicle.color or '-' }}</td>
+                                <td>
+                                    <a href="/vehicles/edit/{{ vehicle.id }}" class="btn btn-secondary btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="/vehicles/delete/{{ vehicle.id }}" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this vehicle?');"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:#aaa;">No vehicles found. Add your first vehicle!</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+            <div class="dashboard-section">
+                <h2>Quick Actions</h2>
+                <div style="display:flex;flex-wrap:wrap;gap:18px;">
+                    <a href="/book" class="btn btn-primary"><i class="fas fa-calendar-plus"></i> Book Parking</a>
+                    <a href="/vehicles" class="btn btn-secondary"><i class="fas fa-car"></i> Manage Vehicles</a>
+                    <a href="/payments" class="btn btn-secondary"><i class="fas fa-wallet"></i> Payment History</a>
+                    <a href="/support" class="btn btn-secondary"><i class="fas fa-headset"></i> Get Support</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        // Close sidebar on click outside (mobile)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        // Close sidebar on navigation (mobile)
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

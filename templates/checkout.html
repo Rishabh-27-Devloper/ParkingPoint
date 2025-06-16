@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_insiide.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments" class="active"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="booking-container" style="max-width:500px;margin:40px auto 0;">
+                <div class="booking-section" style="box-shadow:0 2px 12px #e3eaf7;border-radius:16px;padding:32px 28px 28px;background:#fff;">
+                    <h2 class="section-title" style="text-align:center;margin-bottom:24px;">
+                        <i class="fas fa-wallet" style="color:#2b7cff;"></i>
+                        Checkout & Payment
+                    </h2>
+                    <form action="/create_order" method="POST" style="display:flex;flex-direction:column;gap:18px;">
+                        <label style="font-weight:600;color:#2c5aa0;">Enter Amount (INR)</label>
+                        <input type="text" name="amount" placeholder="Enter amount (INR)" class="form-control" style="padding:12px 14px;border-radius:8px;border:1px solid #cfd8dc;">
+                        <button type="submit" class="btn btn-primary" style="margin-top:10px;">
+                            <i class="fas fa-credit-card"></i> Pay Now
+                        </button>
+                    </form>
+                    {% if order_id %}
+                    <div style="text-align:center;margin-top:30px;">
+                        <span style="color:#2b7cff;font-weight:600;">Processing payment...</span>
+                    </div>
+                    <script>
+                        var options = {
+                            "key": "{{ KEY_ID }}",
+                            "amount": "{{ amount }}",
+                            "currency": "INR",
+                            "name": "Parking Point",
+                            "description": "Parking Payment",
+                            "order_id": "{{ order_id }}",
+                            "handler": function (response){
+                                var form = document.createElement("form");
+                                form.setAttribute("method", "post");
+                                form.setAttribute("action", "/payment_success");
+                                var fields = ['razorpay_payment_id', 'razorpay_order_id', 'razorpay_signature'];
+                                fields.forEach(function(field){
+                                    var input = document.createElement("input");
+                                    input.type = "hidden";
+                                    input.name = field;
+                                    input.value = response[field];
+                                    form.appendChild(input);
+                                });
+                                const bookingInput = document.createElement('input');
+                                bookingInput.type = 'hidden';
+                                bookingInput.name = 'booking';
+                                bookingInput.value = JSON.stringify({{ order_details|tojson }});
+                                bookingInput.setAttribute('id', 'booking');
+                                form.appendChild(bookingInput);
+                                document.body.appendChild(form);
+                                form.submit();
+                            },
+                            "theme": {
+                                "color": "#2b7cff"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    </script>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fa-brands" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</body>
+</html>

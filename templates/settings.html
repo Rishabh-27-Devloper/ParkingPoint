@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Parking Point</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{url_for('static',filename='main_style.css')}}" rel="stylesheet">
+    <link href="{{url_for('static',filename='style_inside.css')}}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{url_for('static',filename='logo.jpg')}}" alt="Parking Point Logo">
+                <span>Parking Point</span>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/profile"><i class="fas fa-user-circle"></i> Dashboard</a></li>
+                    <li><a href="/book"><i class="fas fa-calendar-plus"></i> Book Parking</a></li>
+                    <li><a href="/my-bookings"><i class="fas fa-parking"></i> My Bookings</a></li>
+                    <li><a href="/vehicles"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="/payments"><i class="fas fa-wallet"></i> Payments</a></li>
+                    <li><a href="/notifications"><i class="fas fa-bell"></i> Notifications</a></li>
+                    <li><a href="/settings" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="/support"><i class="fas fa-headset"></i> Support</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/logout" style="color:#2b7cff;text-decoration:none;font-weight:600;">Logout</a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <img src="{{url_for('static',filename='avator.jpg') }}" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span>{{ user.name or "User Name" }}</span>
+                        <small>{{ user.email or "user@email.com" }}</small>
+                    </div>
+                </div>
+                <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="dashboard-section" style="max-width:600px;margin:auto;">
+                <h2>Account Settings</h2>
+                <form method="POST" action="/settings" enctype="multipart/form-data" class="settings-form">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-user"></i> Name</label>
+                        <input type="text" id="name" name="name" value="{{ user.name or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="email" name="email" value="{{ user.email or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Change Password</label>
+                        <input type="password" id="password" name="password" placeholder="New password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password"><i class="fas fa-lock"></i> Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password">
+                    </div>
+                    <hr>
+                    <h3>Preferences</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-bell"></i> Email Notifications</label>
+                        <label class="switch">
+                            <input type="checkbox" name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-language"></i> Language</label>
+                        <select name="language" id="language">
+                            <option value="en" {% if user.language == 'en' %}selected{% endif %}>English</option>
+                            <option value="hi" {% if user.language == 'hi' %}selected{% endif %}>Hindi</option>
+                            <option value="kn" {% if user.language == 'kn' %}selected{% endif %}>Kannada</option>
+                            <!-- Add more languages as needed -->
+                        </select>
+                    </div>
+                    <hr>
+                    <h3>Privacy</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-user-secret"></i> Make Profile Private</label>
+                        <label class="switch">
+                            <input type="checkbox" name="private_profile" {% if user.private_profile %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-trash"></i> Delete Account</label>
+                        <a href="/delete-account" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">Delete</a>
+                    </div>
+                    <div class="form-group" style="text-align:right;">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/919686929429" class="fab" title="Chat on WhatsApp" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+        // Close sidebar on click outside (mobile)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        // Close sidebar on navigation (mobile)
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+    </script>
+    <style>
+        .settings-form .form-group {
+            margin-bottom: 18px;
+        }
+        .settings-form label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .settings-form input[type="text"],
+        .settings-form input[type="email"],
+        .settings-form input[type="tel"],
+        .settings-form input[type="password"],
+        .settings-form select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d0d7e2;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .settings-form input[type="file"] {
+            margin-top: 6px;
+        }
+        .settings-form .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+        .settings-form .switch input {display:none;}
+        .settings-form .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .settings-form .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .settings-form .switch input:checked + .slider {
+            background-color: #2b7cff;
+        }
+        .settings-form .switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .settings-form .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .settings-form .btn-danger:hover {
+            background: #c0392b;
+        }
+    </style>
+</body>
+</html>
