@@ -157,7 +157,7 @@ git push origin feature/my-feature
 
 ## 💡 Credits
 
-- Developed by **[Your Name]**
+- Developed by **Prakhar Shukla**
 - Email & QR integration by [Flask & qrcode]
 - Android scanning via [ZXing](https://github.com/zxing/zxing)
 - Map visualization by [LeafletJS](https://leafletjs.com)
