@@ -94,7 +94,7 @@ All managed through `Database.py`, with auto-initialization and query helpers.
 
 ```bash
 git clone https://github.com/Rishabh-27-Devloper/ParkingPoint.git
-cd parking-point
+cd ParkingPoint
 pip install -r requirements.txt
 python main.py
 ```
