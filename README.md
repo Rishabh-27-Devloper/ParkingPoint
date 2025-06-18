@@ -93,7 +93,7 @@ All managed through `Database.py`, with auto-initialization and query helpers.
 ### ⚙️ Backend Setup
 
 ```bash
-git clone https://github.com/yourusername/parking-point.git
+git clone https://github.com/Rishabh-27-Devloper/ParkingPoint.git
 cd parking-point
 pip install -r requirements.txt
 python main.py
